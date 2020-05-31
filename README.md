@@ -1,2 +1,2 @@
-# web-apps
-Repository for Web Applications
+# Web Apps
+Repository for Web Applications.
