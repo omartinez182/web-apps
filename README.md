@@ -1,6 +1,6 @@
 # Web Apps
-Repository for Web Applications. \\
+Repository for Web Applications.<br/>
 
-NYC Vehicle Collision Data: http://54.144.131.43:8501/ \\
-Description: Web application to analyze vehicle collision data. 
-Data Source: The web app uses the NYC Open Data API.
+<b>NYC Vehicle Collision Data:</b> http://54.144.131.43:8501/<br/> 
+<b>Description:</b> Web application to analyze vehicle collision data.<br/>
+<b>Data Source:</b> The web app uses the NYC Open Data API.
