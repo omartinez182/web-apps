@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 
 
-DATA_URL = ("OLX_2020.csv")
+DATA_URL = ("Scrape_2020.csv")
 
 st.title("Real Estate Overview Guatemala City")
 st.markdown("Dashboard to Analyze Properties for Sale in Guatemala City 🇬🇹")
