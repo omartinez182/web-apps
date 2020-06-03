@@ -6,12 +6,12 @@ import pandas as pd
 import numpy as np
 
 
-DATA_URL = ("Scrape_2020.csv")
+DATA_URL = ("Scrape_2020_1.csv")
 
 st.title("Real Estate Overview Guatemala City")
 st.markdown("Dashboard to Analyze Properties for Sale in Guatemala City 🇬🇹")
 st.markdown("Built by Eduardo Martinez")
-st.markdown("Data Scraped from OLX")
+st.markdown("Data Scraped from the Web")
 
 
 @st.cache(persist=True)#We use this to cache the info and not load the data every time we scroll up/down
@@ -21,8 +21,8 @@ def load_data(nrows):
     data.dropna(subset=['latitude', 'longitude'], inplace=True)
     return data
 
-#Load 1,000 rows of data
-data = load_data(1000)
+#Load 1,0000 rows of data
+data = load_data(10000)
 
 
 st.header("Filter Properties by # of Beedrooms")
