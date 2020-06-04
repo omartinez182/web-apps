@@ -1,3 +1,4 @@
+#Load libraries
 from pandas import json_normalize
 import plotly.express as px
 import streamlit as st
@@ -5,9 +6,10 @@ import pydeck as pdk
 import pandas as pd
 import numpy as np
 
+#Load dataset
+DATA_URL = ("Scrape_2020.csv")
 
-DATA_URL = ("Scrape_20202.csv")
-
+#Create initial titles/subtitles
 st.title("Real Estate Overview Guatemala City")
 st.markdown("Dashboard to Analyze Properties for Sale in Guatemala City 🇬🇹 🏘️")
 st.markdown("Built by Eduardo Martinez")
