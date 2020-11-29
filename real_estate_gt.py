@@ -12,7 +12,7 @@ DATA_URL = ("Scrape_2020.csv")
 #Create initial titles/subtitles
 st.title("Real Estate Overview Guatemala City")
 st.markdown("Dashboard to Analyze Properties for Sale in Guatemala City 🇬🇹 🏘️")
-st.markdown("Built by Eduardo Martinez")
+st.markdown("Built by Omar Eduardo Martinez")
 st.markdown("Data Scraped from the Web")
 
 
