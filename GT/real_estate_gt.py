@@ -9,7 +9,7 @@ import numpy as np
 DATA_URL = ("https://raw.githubusercontent.com/omartinez182/web-apps/master/GT/Scrape_Sale_01-01-2021.csv")
 
 #Create initial titles/subtitles
-st.title("Real Estate Overview Guatemala City")
+st.title("Real Estate Analysis Guatemala City")
 st.markdown("Esta aplicación te permite analizar los precios de propiedades en venta en la Ciudad de Guatemala. 🇬🇹 🏘️")
 st.markdown("Además de las visualizaciones, también puedes encontrar la data cruda al final de la página.")
 st.markdown("Built by Omar Eduardo Martinez")
@@ -28,17 +28,21 @@ data = load_data(10000)
 
 st.header("Selecciona la Zona de interes")
 #Create a slider to select the zone
-selected_zone = st.selectbox("Seleccionar Zona", data['Zone'].unique()) #Add a slider element
+selected_zone = st.selectbox("Seleccionar Zona", data['Zone'].unique(), key='zone_box', index=1) #Add a dropdown element
 data = data[data['Zone'] == selected_zone]
-#Print the average price for the selection
-st.write("El precio promedio por metro cuadrado para la zona seleccionada es de: ", round(data['Price_m2_USD'].mean(),2), "USD")
+#Print the average price for the selection & the number of observations available
+st.write("El precio promedio por metro cuadrado en", selected_zone, "es de: ", round(data['Price_m2_USD'].mean(),2), "US$. Este calculo fue realizado en base a", data.shape[0],"propiedades." )
 
 
 st.header("Filtra Propiedades dependiendo del # de habitaciones")
 #Create a slider to select the number of bedrooms
-how_many_bedrooms = st.slider("Selecciona el # de habitaciones", 0, 10) #Add a slider element
+how_many_bedrooms = st.slider("Selecciona el # de habitaciones", 0, 10, value=3) #Add a slider element
 #Create a map based on a query to the dataframe
-st.map(data.query("Bedrooms >= @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
+st.map(data.query("Bedrooms == @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
+#Filter 
+data2 = data[data['Bedrooms'] == how_many_bedrooms]
+#Print the average price for the selection of both zone and # of bedrooms
+st.write("El precio promedio por metro cuadrado para", selected_zone, ", en propiedades con", how_many_bedrooms, "habitaciones, es de: ",round(data2['Price_m2_USD'].mean(),2), "US$")
 
 
 st.subheader("Precios por Zona/Ubicacion (Precios por Metro Cuadrado)")
