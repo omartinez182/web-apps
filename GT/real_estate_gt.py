@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 
 #Load dataset
-DATA_URL = ("https://raw.githubusercontent.com/omartinez182/web-apps/master/GT/Scrape_2020.csv")
+DATA_URL = ("https://raw.githubusercontent.com/omartinez182/web-apps/master/GT/Scrape_Sale_01-01-2021.csv")
 
 #Create initial titles/subtitles
 st.title("Real Estate Overview Guatemala City")
@@ -31,10 +31,10 @@ st.header("Filtra Propiedades dependiendo del # de habitaciones")
 #Create a slider to select the number of people
 how_many_bedrooms = st.slider("Selecciona el # de habitaciones", 0, 10) #Add a slider element
 #Create a map based on a query to the dataframe
-st.map(data.query("number_of_bedrooms >= @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
+st.map(data.query("Bedrooms >= @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
 
 
-st.subheader("Precios por Zona/Ubicacion")
+st.subheader("Precios por Zona/Ubicacion (Precios por Metro Cuadrado)")
 midpoint = (np.average(data['latitude']), np.average(data['longitude']))
 #Create a 3D map with pydeck
 st.write(pdk.Deck(
@@ -48,20 +48,20 @@ st.write(pdk.Deck(
     layers=[
         pdk.Layer(
         "HexagonLayer",
-        data = data[['price_usd', 'latitude', 'longitude']],
+        data = data[['Price_m2_USD', 'latitude', 'longitude']],
         get_position = ['longitude', 'latitude'],
         radius = 100,
         extruded = True,
         pickable = True,
-        elevation_scale = 6,
-        elevation_range = [0,500],
+        elevation_scale = 2,
+        elevation_range = [min(data['Price_m2_USD']),max(data['Price_m2_USD'])],
         auto_highlight = True,
         ),
     ],
 ))
 
 
-st.subheader("Precios por Metro Cuadrado (Superficie Total)")
+st.subheader("Propiedades por Superficie Total")
 midpoint = (np.average(data['latitude']), np.average(data['longitude']))
 #Create a 3D map with pydeck
 st.write(pdk.Deck(
@@ -75,13 +75,13 @@ st.write(pdk.Deck(
     layers=[
         pdk.Layer(
         "HexagonLayer",
-        data = data[['m2', 'latitude', 'longitude']],
+        data = data[['Surface', 'latitude', 'longitude']],
         get_position = ['longitude', 'latitude'],
         radius = 100,
         extruded = True,
         pickable = True,
         elevation_scale = 6,
-        elevation_range = [0,500],
+        elevation_range = [min(data['Surface']),max(data['Surface'])],
         auto_highlight = True,
         ),
     ],
