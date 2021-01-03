@@ -26,9 +26,13 @@ def load_data(nrows):
 #Load 1,0000 rows of data
 data = load_data(10000)
 
+st.header("Selecciona la Zona de interes")
+#Create a slider to select the zone
+selected_zone = st.selectbox("Seleccionar Zona", data['Zone'].unique()) #Add a slider element
+data = data[data['Zone'] == selected_zone]
 
 st.header("Filtra Propiedades dependiendo del # de habitaciones")
-#Create a slider to select the number of people
+#Create a slider to select the number of bedrooms
 how_many_bedrooms = st.slider("Selecciona el # de habitaciones", 0, 10) #Add a slider element
 #Create a map based on a query to the dataframe
 st.map(data.query("Bedrooms >= @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
