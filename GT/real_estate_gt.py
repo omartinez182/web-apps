@@ -30,6 +30,9 @@ st.header("Selecciona la Zona de interes")
 #Create a slider to select the zone
 selected_zone = st.selectbox("Seleccionar Zona", data['Zone'].unique()) #Add a slider element
 data = data[data['Zone'] == selected_zone]
+#Print the average price for the selection
+st.write("El precio promedio por metro cuadrado para la zona seleccionada es de: ", round(data['Price_m2_USD'].mean(),2), "USD")
+
 
 st.header("Filtra Propiedades dependiendo del # de habitaciones")
 #Create a slider to select the number of bedrooms
