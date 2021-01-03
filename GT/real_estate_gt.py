@@ -1,5 +1,4 @@
 #Load libraries
-from pandas import json_normalize
 import plotly.express as px
 import streamlit as st
 import pydeck as pdk
@@ -7,11 +6,12 @@ import pandas as pd
 import numpy as np
 
 #Load dataset
-DATA_URL = ("/GT/Scrape_2020.csv")
+DATA_URL = ("https://raw.githubusercontent.com/omartinez182/web-apps/master/GT/Scrape_2020.csv")
 
 #Create initial titles/subtitles
 st.title("Real Estate Overview Guatemala City")
-st.markdown("Dashboard to Analyze Properties for Sale in Guatemala City 🇬🇹 🏘️")
+st.markdown("Esta aplicación te permite analizar los precios de propiedades en venta en la Ciudad de Guatemala. 🇬🇹 🏘️")
+st.markdown("Además de las visualizaciones, también puedes encontrar la data cruda al final de la página.")
 st.markdown("Built by Omar Eduardo Martinez")
 st.markdown("Data Scraped from the Web")
 
@@ -27,14 +27,14 @@ def load_data(nrows):
 data = load_data(10000)
 
 
-st.header("Filter Properties by # of Beedrooms")
+st.header("Filtra Propiedades dependiendo del # de habitaciones")
 #Create a slider to select the number of people
-how_many_bedrooms = st.slider("Select # of Beedrooms", 0, 10) #Add a slider element
+how_many_bedrooms = st.slider("Selecciona el # de habitaciones", 0, 10) #Add a slider element
 #Create a map based on a query to the dataframe
 st.map(data.query("number_of_bedrooms >= @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
 
 
-st.subheader("Property Prices by Location")
+st.subheader("Precios por Zona/Ubicacion")
 midpoint = (np.average(data['latitude']), np.average(data['longitude']))
 #Create a 3D map with pydeck
 st.write(pdk.Deck(
@@ -61,7 +61,7 @@ st.write(pdk.Deck(
 ))
 
 
-st.subheader("Property Prices by Squared Meters (Total Surface)")
+st.subheader("Precios por Metro Cuadrado (Superficie Total)")
 midpoint = (np.average(data['latitude']), np.average(data['longitude']))
 #Create a 3D map with pydeck
 st.write(pdk.Deck(
@@ -89,6 +89,6 @@ st.write(pdk.Deck(
 
 
 #Review the raw data (dataframe) in the app
-if st.checkbox('Show Raw Data', False): #Creates a checkbox to show/hide the data
-    st.subheader('Raw Data')
+if st.checkbox('Mostrar Data', False): #Creates a checkbox to show/hide the data
+    st.subheader('Data Cruda')
     st.write(data)
