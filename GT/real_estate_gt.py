@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 
 #Load dataset
-DATA_URL = ("Scrape_2020.csv")
+DATA_URL = ("/GT/Scrape_2020.csv")
 
 #Create initial titles/subtitles
 st.title("Real Estate Overview Guatemala City")
