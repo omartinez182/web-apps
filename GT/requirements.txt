@@ -1,0 +1,7 @@
+numpy==1.17.3
+pandas==0.24.2
+pydeck==0.3.0
+streamlit==0.73.0
+plotly==4.0.0
+statsmodels==0.12.1
+lxml==4.6.2
