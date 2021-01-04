@@ -76,6 +76,9 @@ def process_dataset(df):
     # Drop duplicates based on specific columns
     df = df.drop_duplicates(subset=['latitude','longitude','Price_USD'])
     
+    # Drop properties with less than 30 sqmts (surface)
+    df = df[df['Surface'] >= 30]
+    
     # REMOVE OUTLIERS
     # set up the capper (right) 
     capper_right = outr.OutlierTrimmer(distribution='skewed', tail='right', fold=2, variables=['Surface','Price_m2_USD'])
@@ -85,7 +88,7 @@ def process_dataset(df):
     df2 = capper_right.transform(df)
     
     # set up the capper (left) 
-    capper_left = outr.OutlierTrimmer(distribution='quantiles', tail='left', fold=0.02, variables=['Surface','Price_m2_USD'])
+    capper_left = outr.OutlierTrimmer(distribution='quantiles', tail='left', fold=0.02, variables=['Price_m2_USD'])
     # fit the capper (left)
     capper_left.fit(df)
     # transform the data

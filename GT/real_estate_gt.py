@@ -27,7 +27,8 @@ def load_data(nrows):
 
 #Load 1,0000 rows of data
 data = load_data(10000)
-data_scatter = data.copy()
+data_stat = data.copy()
+data_stat2 = data.copy()
 
 st.header("Selecciona de Zona")
 #Create a slider to select the zone
@@ -123,21 +124,28 @@ st.markdown("<small> *No todas las propiedades son desplegadas en el mapa. Debid
 st.text("")
 st.text("")
 #Create a scatter plot with the relationship between zone and price
-st.header("Análisis de Estadístico")
-st.subheader("Relación entre Precio ($US) y Superficie (m²)")
+st.header("Análisis Estadístico")
+st.markdown("Esta sección contiene diferentes análisis estadísticos para la zona seleccionada. La idea es entender mejor la distribución de precios de las propiedades, y a un nivel macro, poder tener una idea de que tan importante es el tamaño de los bienes para predecir su precio total.")
 
 #Create a slider to select the zone
-selected_zone_scatter = st.selectbox("Seleccionar Zona", data_scatter['Zone'].unique(), key='zone_box_scatter', index=1) #Add a dropdown element
-data_scatter = data_scatter[data_scatter['Zone'] == selected_zone_scatter]
+selected_zone_stat = st.selectbox("Seleccionar Zona", data_stat['Zone'].unique(), key='zone_box_stat', index=1) #Add a dropdown element
+data_stat = data_stat[data_stat['Zone'] == selected_zone_stat]
 
+st.write("Distribución de propiedades basándose en el precio por m² para ", selected_zone_stat, ".")
+
+#Create histogram for price by m2 (filtered by zone)
+fig_hist = px.histogram(data_stat, x="Price_m2_USD", labels=dict(Price_m2_USD="Price by m²"))
+fig_hist.layout.yaxis.title.text = 'Number of Properties' #Rename y-axis label
+st.plotly_chart(fig_hist, use_container_width=True) #write the figure in the web app and make it responsive
+
+st.subheader("Relación entre Precio ($US) y Superficie (m²)")
 #Create scatter plot (filtered by zone)
-fig = px.scatter(data_scatter, x='Surface', y='Price_USD', trendline="ols", color='Price_m2_USD',
+fig_scatter = px.scatter(data_stat, x='Surface', y='Price_USD', trendline="ols", color='Price_m2_USD',
                 labels=dict(Surface="Surface in (m²)", Price_USD="Price in (US$)", Price_m2_USD="Price by m²"))
-st.plotly_chart(fig, use_container_width=True) #write the figure in the web app
-
+st.plotly_chart(fig_scatter, use_container_width=True) #write the figure in the web app and make it responsive
 
 #Get results from the linear regression
-results = px.get_trendline_results(fig)
+results = px.get_trendline_results(fig_scatter)
 results_summary = results.px_fit_results.iloc[0].summary()
 
 #Note that tables is a list. The table at index 1 is the "core" table. Additionally, read_html puts dfs in a list, so we want index 0
@@ -145,9 +153,27 @@ results_summary = results.px_fit_results.iloc[0].summary()
 results_as_html = results_summary.tables[0].as_html()
 reg_results = pd.read_html(results_as_html, header=None, index_col=0)[0] #Read as df
 r_squared = reg_results.loc['Dep. Variable:'][3] #Extract R-Squared
-st.write("En función del modelo desplegado en el gráfico de dispersión, se puede notar que para la", selected_zone_scatter, " el","{:.0%}".format(r_squared), "de la varianza en el precio puede ser predicha basándose en el valor la superficie.")
-st.markdown("Cuanto más alto este porcentaje, mayor es la dependencia del precio en función de la superficie. Esto podría indicar que otras variables son menos significativas. Si el porcentaje es bajo, puede ser que otras variables que no están siendo consideradas en este análisis, tengan un mayor efecto en el precio, por ejemplo, la plusvalía de la zona, seguridad, proximidad a puntos de interés, etc.")
+st.write("En función del modelo desplegado en el gráfico de dispersión, se puede notar que para la", selected_zone_stat, ", el","{:.0%}".format(r_squared), "de la varianza en el precio puede ser predicha basándose en la cantidad de m² de las propiedades.")
+st.markdown("Cuanto más alto este porcentaje, mayor es la dependencia del precio en función de la superficie. Esto podría indicar que otras variables son menos significativas. Por otra parte, si el porcentaje es bajo, puede ser que otras variables que no están siendo consideradas en este análisis tengan un mayor efecto en el precio, por ejemplo, la plusvalía de la zona, seguridad, proximidad a puntos de interés, etc.")
 st.markdown("""Por último, también se sugiere considerar la cantidad de observaciones que son partes del análisis, ya que el tamaño de la muestra también puede afectar el <a href="https://es.wikipedia.org/wiki/Coeficiente_de_determinaci%C3%B3n" target="_blank"> coeficiente de determinación.</a>""", unsafe_allow_html=True)
+
+
+st.text("")
+#Comparison between Zones
+st.subheader("Comparación de distribución de precios entre Zonas")
+selected_zone_stat2 = st.selectbox("Seleccionar una segunda Zona para realizar la comparación.", data_stat2['Zone'].unique(), key='zone_box_2',index=0) #Add a dropdown element
+data_stat2 = data_stat2[data_stat2['Zone'] == selected_zone_stat2]
+
+# Overlay histogram
+compare_hist_df = pd.DataFrame(dict(
+    Zonas=np.concatenate(([selected_zone_stat]*len(data_stat['Price_m2_USD']), [selected_zone_stat2]*len(data_stat2['Price_m2_USD']))), 
+    data  =np.concatenate((data_stat['Price_m2_USD'],data_stat2['Price_m2_USD']))
+))
+fig_compare_hist = px.histogram(compare_hist_df, x="data", color="Zonas", barmode="overlay",
+                                labels=dict(data="Price by m²"))
+fig_compare_hist.layout.yaxis.title.text = 'Number of Properties'
+st.plotly_chart(fig_compare_hist, use_container_width=True) #write the figure in the web app and make it responsive
+
 
 st.text("")
 st.text("")
