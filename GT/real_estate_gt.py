@@ -30,7 +30,7 @@ data = load_data(10000)
 data_stat = data.copy()
 data_stat2 = data.copy()
 
-st.header("Selecciona de Zona")
+st.header("Selección de Zona")
 #Create a slider to select the zone
 selected_zone = st.selectbox("Seleccionar Zona", data['Zone'].unique(), key='zone_box', index=1) #Add a dropdown element
 data = data[data['Zone'] == selected_zone]
@@ -56,7 +56,7 @@ st.markdown(
 
 
 st.text("")
-st.subheader("Propiedades by Precio por m²")
+st.subheader("Propiedades por Precio por m²")
 #Explanation
 st.write("Este mapa representa la distribución de las propiedades disponibles en", selected_zone, ". La altura y el color de las barras representan el precio en US$ por m².")
 
@@ -87,7 +87,7 @@ st.write(pdk.Deck(
 
 
 st.text("")
-st.subheader("Propiedades by Superficie Total")
+st.subheader("Propiedades por Superficie Total")
 #Explanation
 st.write("Este mapa representa la distribución de las propiedades disponibles en", selected_zone, ". La altura y el color de las barras representan la superficie total de las propiedades en m².")
 
@@ -134,14 +134,14 @@ data_stat = data_stat[data_stat['Zone'] == selected_zone_stat]
 st.write("Distribución de propiedades basándose en el precio por m² para ", selected_zone_stat, ".")
 
 #Create histogram for price by m2 (filtered by zone)
-fig_hist = px.histogram(data_stat, x="Price_m2_USD", labels=dict(Price_m2_USD="Price by m²"))
-fig_hist.layout.yaxis.title.text = 'Number of Properties' #Rename y-axis label
+fig_hist = px.histogram(data_stat, x="Price_m2_USD", labels=dict(Price_m2_USD="Precio por m²"))
+fig_hist.layout.yaxis.title.text = 'Número de Propiedades' #Rename y-axis label
 st.plotly_chart(fig_hist, use_container_width=True) #write the figure in the web app and make it responsive
 
 st.subheader("Relación entre Precio ($US) y Superficie (m²)")
 #Create scatter plot (filtered by zone)
 fig_scatter = px.scatter(data_stat, x='Surface', y='Price_USD', trendline="ols", color='Price_m2_USD',
-                labels=dict(Surface="Surface in (m²)", Price_USD="Price in (US$)", Price_m2_USD="Price by m²"))
+                labels=dict(Surface="Superficie en m²", Price_USD="Precio en US$", Price_m2_USD="Precio por m²"))
 st.plotly_chart(fig_scatter, use_container_width=True) #write the figure in the web app and make it responsive
 
 #Get results from the linear regression
@@ -170,8 +170,8 @@ compare_hist_df = pd.DataFrame(dict(
     data  =np.concatenate((data_stat['Price_m2_USD'],data_stat2['Price_m2_USD']))
 ))
 fig_compare_hist = px.histogram(compare_hist_df, x="data", color="Zonas", barmode="overlay",
-                                labels=dict(data="Price by m²"))
-fig_compare_hist.layout.yaxis.title.text = 'Number of Properties'
+                                labels=dict(data="Precio por m²"))
+fig_compare_hist.layout.yaxis.title.text = 'Número de Propiedades'
 st.plotly_chart(fig_compare_hist, use_container_width=True) #write the figure in the web app and make it responsive
 
 
