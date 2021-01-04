@@ -133,7 +133,8 @@ data_scatter = data_scatter[data_scatter['Zone'] == selected_zone_scatter]
 #Create scatter plot (filtered by zone)
 fig = px.scatter(data_scatter, x='Surface', y='Price_USD', trendline="ols", color='Price_m2_USD',
                 labels=dict(Surface="Surface in (m²)", Price_USD="Price in (US$)", Price_m2_USD="Price by m²"))
-st.write(fig) #write the figure in the web app
+st.plotly_chart(fig, use_container_width=True) #write the figure in the web app
+
 
 #Get results from the linear regression
 results = px.get_trendline_results(fig)
@@ -146,7 +147,7 @@ reg_results = pd.read_html(results_as_html, header=None, index_col=0)[0] #Read a
 r_squared = reg_results.loc['Dep. Variable:'][3] #Extract R-Squared
 st.write("En función del modelo desplegado en el gráfico de dispersión, se puede notar que para la", selected_zone_scatter, " el","{:.0%}".format(r_squared), "de la varianza en el precio puede ser predicha basándose en el valor la superficie.")
 st.markdown("Cuanto más alto este porcentaje, mayor es la dependencia del precio en función de la superficie. Esto podría indicar que otras variables son menos significativas. Si el porcentaje es bajo, puede ser que otras variables que no están siendo consideradas en este análisis, tengan un mayor efecto en el precio, por ejemplo, la plusvalía de la zona, seguridad, proximidad a puntos de interés, etc.")
-st.markdown("Por último, también se sugiere considerar la cantidad de observaciones que son partes del análisis, ya que el tamaño de la muestra también puede afectar el coeficiente de determinación.")
+st.markdown("""Por último, también se sugiere considerar la cantidad de observaciones que son partes del análisis, ya que el tamaño de la muestra también puede afectar el <a href="https://es.wikipedia.org/wiki/Coeficiente_de_determinaci%C3%B3n" target="_blank"> coeficiente de determinación.</a>""", unsafe_allow_html=True)
 
 st.text("")
 st.text("")
