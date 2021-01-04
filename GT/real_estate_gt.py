@@ -131,7 +131,7 @@ st.markdown("Esta sección contiene diferentes análisis estadísticos para la z
 selected_zone_stat = st.selectbox("Seleccionar Zona", data_stat['Zone'].unique(), key='zone_box_stat', index=1) #Add a dropdown element
 data_stat = data_stat[data_stat['Zone'] == selected_zone_stat]
 
-st.write("Distribución de propiedades basándose en el precio por m² para ", selected_zone_stat, ".")
+st.write("Distribución de precios por m² ($US), para propiedades en", selected_zone_stat, ".")
 
 #Create histogram for price by m2 (filtered by zone)
 fig_hist = px.histogram(data_stat, x="Price_m2_USD", labels=dict(Price_m2_USD="Precio por m²"))
@@ -141,7 +141,7 @@ st.plotly_chart(fig_hist, use_container_width=True) #write the figure in the web
 st.subheader("Relación entre Precio ($US) y Superficie (m²)")
 #Create scatter plot (filtered by zone)
 fig_scatter = px.scatter(data_stat, x='Surface', y='Price_USD', trendline="ols", color='Price_m2_USD',
-                labels=dict(Surface="Superficie en m²", Price_USD="Precio en US$", Price_m2_USD="Precio por m²"))
+                labels=dict(Surface="Superficie en m²", Price_USD="Precio en US$", Price_m2_USD="Precio por m² ($US)"))
 st.plotly_chart(fig_scatter, use_container_width=True) #write the figure in the web app and make it responsive
 
 #Get results from the linear regression
@@ -170,7 +170,7 @@ compare_hist_df = pd.DataFrame(dict(
     data  =np.concatenate((data_stat['Price_m2_USD'],data_stat2['Price_m2_USD']))
 ))
 fig_compare_hist = px.histogram(compare_hist_df, x="data", color="Zonas", barmode="overlay",
-                                labels=dict(data="Precio por m²"))
+                                labels=dict(data="Precio por m² ($US)"))
 fig_compare_hist.layout.yaxis.title.text = 'Número de Propiedades'
 st.plotly_chart(fig_compare_hist, use_container_width=True) #write the figure in the web app and make it responsive
 
