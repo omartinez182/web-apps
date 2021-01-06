@@ -134,7 +134,7 @@ data_stat = data_stat[data_stat['Zone'] == selected_zone_stat]
 st.write("Distribución de precios por m² ($US), para propiedades en", selected_zone_stat, ".")
 
 #Create histogram for price by m2 (filtered by zone)
-fig_hist = px.histogram(data_stat, x="Price_m2_USD", labels=dict(Price_m2_USD="Precio por m²"))
+fig_hist = px.histogram(data_stat, x="Price_m2_USD", labels=dict(Price_m2_USD="Precio por m² ($US)"))
 fig_hist.layout.yaxis.title.text = 'Número de Propiedades' #Rename y-axis label
 st.plotly_chart(fig_hist, use_container_width=True) #write the figure in the web app and make it responsive
 #Explanation on distinction between mean and median
@@ -177,7 +177,7 @@ fig_compare_hist.layout.yaxis.title.text = 'Número de Propiedades'
 st.plotly_chart(fig_compare_hist, use_container_width=True) #write the figure in the web app and make it responsive
 #Summary
 st.write("El precio promedio para", selected_zone_stat, "es de", round(data_stat['Price_m2_USD'].mean(),2), "$US, mientras que el precio promedio para", selected_zone_stat2, "es de", round(data_stat2['Price_m2_USD'].mean(),2), "$US.")
-st.write("Se recomienda también tomar en cuenta el predio medio debido a que es menos sensible a valores atípicos. El precio medio para", selected_zone_stat, "es de", round(data_stat['Price_m2_USD'].median(),2), "$US, y para", selected_zone_stat2, "es de", round(data_stat2['Price_m2_USD'].median(),2), "$US.")
+st.write("Se recomienda también tomar en cuenta el precio medio debido a que es menos sensible a valores atípicos. El precio medio para", selected_zone_stat, "es de", round(data_stat['Price_m2_USD'].median(),2), "$US, y para", selected_zone_stat2, "es de", round(data_stat2['Price_m2_USD'].median(),2), "$US.")
 
 
 st.text("")
