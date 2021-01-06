@@ -15,7 +15,7 @@ DATA_URL = ("https://raw.githubusercontent.com/omartinez182/web-apps/master/GT/S
 #Create initial titles/subtitles
 st.title("Real Estate Analysis Guatemala City")
 st.markdown("Esta aplicación permite analizar la distribución de precios de propiedades en venta en la Área Metropolitana de la Ciudad de Guatemala. 🇬🇹 🏘️")
-st.markdown('Esta es la única base de datos de acceso abierto y motor de análisis de precios de inmuebles en Guatemala. La aplicación tiene como objetivo apoyar a instituciones gubernamentales, "non-profits", y a todos los guatemaltecos a obtener acceso fácil y gratuito a datos relacionados con el mercado de bienes raíces local. Además, provee análisis estadísticos esenciales para apoyar la toma de decisiones, desde la compra de un nuevo hogar, hasta planificaciones urbanas.')
+st.markdown('De momento, esta es la única base de datos de acceso abierto y motor de análisis de precios de inmuebles en Guatemala. La aplicación tiene como objetivo apoyar a instituciones gubernamentales, "non-profits", y a todos los guatemaltecos a obtener acceso fácil y gratuito a datos relacionados con el mercado de bienes raíces local. Además, provee análisis estadísticos esenciales para apoyar la toma de decisiones, desde la compra de un nuevo hogar, hasta planificaciones urbanas.')
 st.markdown("<small> Built by Omar Eduardo Martinez </small>", unsafe_allow_html=True)
 st.markdown("<small> Data Scraped from the Web </small>", unsafe_allow_html=True)
 
@@ -30,11 +30,12 @@ def load_data(nrows):
 
 #Load 1,0000 rows of data
 data = load_data(10000)
+data_tot = data.copy()
 data_stat = data.copy()
 data_stat2 = data.copy()
 
-st.header("Selección de Zona")
-#Create a slider to select the zone
+st.header("Análisis de Zona")
+#Create a dropdown to select the zone
 selected_zone = st.selectbox("Seleccionar Zona", data['Zone'].unique(), key='zone_box', index=1) #Add a dropdown element
 data = data[data['Zone'] == selected_zone]
 #Print the average price for the selection & the number of observations available
@@ -44,18 +45,18 @@ st.text("")
 st.subheader("Filtra Propiedades dependiendo del # de habitaciones")
 #Create a slider to select the number of bedrooms
 how_many_bedrooms = st.slider("Selecciona el # de habitaciones", 0, 10, value=3) #Add a slider element
-#Create a map based on a query to the dataframe
-st.map(data.query("Bedrooms == @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
 #Filter 
 data_bedrooms = data[data['Bedrooms'] == how_many_bedrooms]
 #Print the average price for the selection of both zone and # of bedrooms
 st.write("El precio medio por m² para", selected_zone, ", en propiedades con", how_many_bedrooms, "habitaciones, es de: ",round(data_bedrooms['Price_m2_USD'].median(),2), "US$. Este calculo fue realizado en base a", data_bedrooms.shape[0],"propiedades.")
+#Create a map based on a query to the dataframe
+st.map(data.query("Bedrooms == @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
 #Disclaimer
-#st.markdown('<small> *"Precio medio" se refiere a la', '<a href="https://es.wikipedia.org/wiki/Mediana_(estad%C3%ADstica)#:~:text=En%20el%20%C3%A1mbito%20de%20la,Se%20le%20denota%20mediana."> mediana </a>', '(estadística). </small>', unsafe_allow_html=True)
-# not centered
 st.markdown(
     """<small> *Precio medio se refiere a la <a href="https://es.wikipedia.org/wiki/Mediana_(estad%C3%ADstica)#:~:text=En%20el%20%C3%A1mbito%20de%20la,Se%20le%20denota%20mediana." target="_blank"> mediana (estadística)</a>. </small>""", unsafe_allow_html=True,
 )
+#Disclaimer
+st.markdown("<small> *No todas las propiedades son desplegadas en el mapa. Debido a la forma en que se recolectan los datos, la latitud y longitud pueden ser un área general, por consiguiente, habrá un traslape en ciertos puntos. No obstante, el número de propiedades analizadas desplegado es preciso. </small>", unsafe_allow_html=True)
 
 
 st.text("")
@@ -88,40 +89,37 @@ st.write(pdk.Deck(
     ],
 ))
 
+#Disclaimer
+st.markdown("<small> *Debido a la forma en la que se recolectan los datos para la latitud y longitud, la delimitación de las zonas en el mapa puede no ser precisa en ciertas ocasiones, no obstante, la clasificación de zona de la propiedad como tal, si es precisa, por consiguiente, los cálculos de precios medios y cualquier otra métrica también serán precisos. </small>", unsafe_allow_html=True)
+
 
 st.text("")
-st.subheader("Propiedades por Superficie Total")
+st.header("Promedios por Zona")
 #Explanation
-st.write("Este mapa representa la distribución de las propiedades disponibles en", selected_zone, ". La altura y el color de las barras representan la superficie total de las propiedades en m².")
+st.write("El gráfico de barras se encuentra ordenado según el precio promedio por m² de cada zona. El color de cada barra representa el precio promedio total para cada zona, es decir, el promedio de los precios de lista de cada propiedad.")
 
-midpoint = (np.average(data['latitude']), np.average(data['longitude']))
-#Create a 3D map with pydeck
-st.write(pdk.Deck(
-    map_style="mapbox://styles/mapbox/light-v9",
-    initial_view_state={
-        "latitude": midpoint[0],
-        "longitude": midpoint[1],
-        "zoom": 11,
-        "pitch": 50,
-    },
-    layers=[
-        pdk.Layer(
-        "HexagonLayer",
-        data = data[['Surface', 'latitude', 'longitude']],
-        get_position = ['longitude', 'latitude'],
-        radius = 100,
-        extruded = True,
-        pickable = True,
-        elevation_scale = 6,
-        elevation_range = [min(data['Surface']),max(data['Surface'])],
-        auto_highlight = True,
-        ),
-    ],
-))
+#Create a multi-select to select the zone
+selected_city = st.multiselect("Seleccionar Ciudad", list(data_tot['City'].unique()), key='city_box', default=["Ciudad de Guatemala"]) #Add a dropdown element
+mask_city = data_tot['City'].isin(selected_city) # Mask to filter dataframe
+data_tot = data_tot[mask_city]
 
+#Average prices by zone
+df_mean = data_tot.groupby('Zone').mean() #Group by zone and calculate averages
+df_mean = df_mean[['Bedrooms','Bathrooms','Surface','Price_USD','Price_m2_USD']]
+df_mean = df_mean.round()
+df_mean = df_mean.sort_values(by='Price_m2_USD')
+df_mean.head()
 
-#Disclaimer
-st.markdown("<small> *No todas las propiedades son desplegadas en el mapa. Debido a la forma en que se recolectan los datos, la latitud y longitud pueden ser un área general, por consiguiente, habrá un traslape en ciertos puntos. No obstante, el número de propiedades analizadas desplegado es preciso. </small>", unsafe_allow_html=True)
+#Create bar plot for averages by zone
+fig_bar = px.bar(df_mean,                   
+             x = df_mean.index,                          
+             y = 'Price_m2_USD',                         
+             color = 'Price_USD',                  
+             labels=dict(x="Zona", Price_USD="Precio (Avg.) US$", Price_m2_USD="Promedio de Precio por m² (US$)")
+             )
+fig_bar.update_xaxes(title='')
+#fig_bar.layout.yaxis.title.text = 'Número de Propiedades' #Rename y-axis label
+st.plotly_chart(fig_bar, use_container_width=True) #write the figure in the web app and make it responsive
 
 
 st.text("")
@@ -140,6 +138,8 @@ st.write("Distribución de precios por m² ($US), para propiedades en", selected
 fig_hist = px.histogram(data_stat, x="Price_m2_USD", labels=dict(Price_m2_USD="Precio por m²"))
 fig_hist.layout.yaxis.title.text = 'Número de Propiedades' #Rename y-axis label
 st.plotly_chart(fig_hist, use_container_width=True) #write the figure in the web app and make it responsive
+#Explanation on distinction between mean and median
+st.write("Nótese que el centro de masa no es el precio medio (mediana) de", round(data_stat['Price_m2_USD'].median(),2), "$US, que se reporta en la sección de Análisis de Zona, sino el precio promedio, el cual es de", round(data_stat['Price_m2_USD'].mean(),2), "$US para", selected_zone_stat, ".")
 
 st.subheader("Relación entre Precio ($US) y Superficie (m²)")
 #Create scatter plot (filtered by zone)
@@ -156,7 +156,7 @@ results_summary = results.px_fit_results.iloc[0].summary()
 results_as_html = results_summary.tables[0].as_html()
 reg_results = pd.read_html(results_as_html, header=None, index_col=0)[0] #Read as df
 r_squared = reg_results.loc['Dep. Variable:'][3] #Extract R-Squared
-st.write("En función del modelo desplegado en el gráfico de dispersión, se puede notar que para la", selected_zone_stat, ", el","{:.0%}".format(r_squared), "de la varianza en el precio puede ser predicha basándose en la cantidad de m² de las propiedades.")
+st.write("En función del modelo desplegado en el gráfico de dispersión, se puede notar que para la", selected_zone_stat, ", el","{:.0%}".format(r_squared), "de la varianza en el precio puede ser predicha basándose en la cantidad de m² de la propiedad.")
 st.markdown("Cuanto más alto este porcentaje, mayor es la dependencia del precio en función de la superficie. Esto podría indicar que otras variables son menos significativas. Por otra parte, si el porcentaje es bajo, puede ser que otras variables que no están siendo consideradas en este análisis tengan un mayor efecto en el precio, por ejemplo, la plusvalía de la zona, seguridad, proximidad a puntos de interés, etc.")
 st.markdown("""Por último, también se sugiere considerar la cantidad de observaciones que son partes del análisis, ya que el tamaño de la muestra también puede afectar el <a href="https://es.wikipedia.org/wiki/Coeficiente_de_determinaci%C3%B3n" target="_blank"> coeficiente de determinación.</a>""", unsafe_allow_html=True)
 
@@ -176,6 +176,9 @@ fig_compare_hist = px.histogram(compare_hist_df, x="data", color="Zonas", barmod
                                 labels=dict(data="Precio por m² ($US)"))
 fig_compare_hist.layout.yaxis.title.text = 'Número de Propiedades'
 st.plotly_chart(fig_compare_hist, use_container_width=True) #write the figure in the web app and make it responsive
+#Summary
+st.write("El precio promedio para", selected_zone_stat, "es de", round(data_stat['Price_m2_USD'].mean(),2), "$US, mientras que el precio promedio para", selected_zone_stat2, "es de", round(data_stat2['Price_m2_USD'].mean(),2), "$US.")
+st.write("Se recomienda también tomar en cuenta el predio medio debido a que es menos sensible a valores atípicos. El precio medio para", selected_zone_stat, "es de", round(data_stat['Price_m2_USD'].median(),2), "$US, y para", selected_zone_stat2, "es de", round(data_stat['Price_m2_USD'].median(),2), "$US.")
 
 
 st.text("")
