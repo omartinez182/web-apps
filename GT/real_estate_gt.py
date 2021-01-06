@@ -108,7 +108,6 @@ df_mean = data_tot.groupby('Zone').mean() #Group by zone and calculate averages
 df_mean = df_mean[['Bedrooms','Bathrooms','Surface','Price_USD','Price_m2_USD']]
 df_mean = df_mean.round()
 df_mean = df_mean.sort_values(by='Price_m2_USD')
-df_mean.head()
 
 #Create bar plot for averages by zone
 fig_bar = px.bar(df_mean,                   
@@ -178,7 +177,7 @@ fig_compare_hist.layout.yaxis.title.text = 'Número de Propiedades'
 st.plotly_chart(fig_compare_hist, use_container_width=True) #write the figure in the web app and make it responsive
 #Summary
 st.write("El precio promedio para", selected_zone_stat, "es de", round(data_stat['Price_m2_USD'].mean(),2), "$US, mientras que el precio promedio para", selected_zone_stat2, "es de", round(data_stat2['Price_m2_USD'].mean(),2), "$US.")
-st.write("Se recomienda también tomar en cuenta el predio medio debido a que es menos sensible a valores atípicos. El precio medio para", selected_zone_stat, "es de", round(data_stat['Price_m2_USD'].median(),2), "$US, y para", selected_zone_stat2, "es de", round(data_stat['Price_m2_USD'].median(),2), "$US.")
+st.write("Se recomienda también tomar en cuenta el predio medio debido a que es menos sensible a valores atípicos. El precio medio para", selected_zone_stat, "es de", round(data_stat['Price_m2_USD'].median(),2), "$US, y para", selected_zone_stat2, "es de", round(data_stat2['Price_m2_USD'].median(),2), "$US.")
 
 
 st.text("")
