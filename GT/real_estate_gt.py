@@ -17,18 +17,17 @@ st.title("Real Estate Analysis Guatemala City")
 st.markdown("Esta aplicación permite analizar la distribución de precios de propiedades en venta en la Área Metropolitana de la Ciudad de Guatemala. 🇬🇹 🏘️")
 st.markdown('De momento, esta es la única base de datos de acceso abierto y motor de análisis de precios de inmuebles en Guatemala. La aplicación tiene como objetivo apoyar a instituciones gubernamentales, "non-profits", y a todos los guatemaltecos a obtener acceso fácil y gratuito a datos relacionados con el mercado de bienes raíces local. Además, provee análisis estadísticos esenciales para apoyar la toma de decisiones, desde la compra de un nuevo hogar, hasta planificaciones urbanas.')
 st.markdown("<small> Built by Omar Eduardo Martinez </small>", unsafe_allow_html=True)
-st.markdown("<small> Data Scraped from the Web </small>", unsafe_allow_html=True)
+st.markdown("<small> Data Scraped from the Web </br> **Last Update:** 01/01/2021 </small>", unsafe_allow_html=True)
 
 
-@st.cache(persist=True)#We use this to cache the info and not load the data every time we scroll up/down
-#Function to perform some transformation in the dataframe
+@st.cache(persist=True) #We use this to cache the info and not load the data every time we scroll up/down
 def load_data(nrows):
-    data = pd.read_csv(DATA_URL, nrows=nrows)
+    data = pd.read_csv(DATA_URL, nrows=nrows) #Function to perform some transformation in the dataframe
     data = data.drop(['Unnamed: 0'], axis=1)
     data.dropna(subset=['latitude', 'longitude'], inplace=True)
     return data
 
-#Load 1,0000 rows of data
+#Load 10,000 rows of data
 data = load_data(10000)
 data_tot = data.copy()
 data_stat = data.copy()
@@ -39,7 +38,7 @@ st.header("Análisis de Zona")
 selected_zone = st.selectbox("Seleccionar Zona", data['Zone'].unique(), key='zone_box', index=1) #Add a dropdown element
 data = data[data['Zone'] == selected_zone]
 #Print the average price for the selection & the number of observations available
-st.write("El precio medio por m² en", selected_zone, "es de: ", round(data['Price_m2_USD'].median(),2), "US$. Este calculo fue realizado en base a", data.shape[0],"propiedades." )
+st.write("El precio medio por m² en", selected_zone, "es de: ", round(data['Price_m2_USD'].median(),2), "US$. Este calculo fue realizado en base a", data.shape[0],"propiedades. El precio medio total es de", "$"+str("{:,}".format(round(data['Price_USD'].median()))+"."))
 
 st.text("")
 st.subheader("Filtra Propiedades dependiendo del # de habitaciones")
@@ -48,7 +47,7 @@ how_many_bedrooms = st.slider("Selecciona el # de habitaciones", 0, 10, value=3)
 #Filter 
 data_bedrooms = data[data['Bedrooms'] == how_many_bedrooms]
 #Print the average price for the selection of both zone and # of bedrooms
-st.write("El precio medio por m² para", selected_zone, ", en propiedades con", how_many_bedrooms, "habitaciones, es de: ",round(data_bedrooms['Price_m2_USD'].median(),2), "US$. Este calculo fue realizado en base a", data_bedrooms.shape[0],"propiedades.")
+st.write("El precio medio por m² para", selected_zone, ", en propiedades con", how_many_bedrooms, "habitaciones, es de: ",round(data_bedrooms['Price_m2_USD'].median(),2), "US$. Este calculo fue realizado en base a", data_bedrooms.shape[0],"propiedades. El precio medio total es de", "$"+str("{:,}".format(round(data_bedrooms['Price_USD'].median()))+"."))
 #Create a map based on a query to the dataframe
 st.map(data.query("Bedrooms == @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
 #Disclaimer
