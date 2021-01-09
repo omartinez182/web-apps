@@ -220,7 +220,7 @@ def get_table_download_link(df):
     b64 = base64.b64encode(
         csv.encode()
     ).decode()  # some strings <-> bytes conversions necessary here
-    return f'<a href="data:file/csv;base64,{b64}" download="real_estate_data.csv">Download CSV file</a>'
+    return f'<a href="data:file/csv;base64,{b64}" download="real_estate_data.csv">Descargar CSV</a>'
 
 st.markdown(get_table_download_link(data), unsafe_allow_html=True)
 
