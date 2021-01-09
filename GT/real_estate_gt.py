@@ -70,7 +70,7 @@ st.write(pdk.Deck(
     initial_view_state={
         "latitude": midpoint[0],
         "longitude": midpoint[1],
-        "zoom": 11,
+        "zoom": 12,
         "pitch": 50,
     },
     layers=[
@@ -78,12 +78,13 @@ st.write(pdk.Deck(
         "HexagonLayer",
         data = data[['Price_m2_USD', 'latitude', 'longitude']],
         get_position = ['longitude', 'latitude'],
-        radius = 100,
+        radius = 50,
         extruded = True,
-        pickable = True,
-        elevation_scale = 2,
+        pickable = False,
+        elevation_scale = 1,
         elevation_range = [min(data['Price_m2_USD']),max(data['Price_m2_USD'])],
         auto_highlight = True,
+        coverage=1
         ),
     ],
 ))
@@ -130,14 +131,22 @@ st.markdown("Esta sección contiene diferentes análisis estadísticos para la z
 selected_zone_stat = st.selectbox("Seleccionar Zona", data_stat['Zone'].unique(), key='zone_box_stat', index=1) #Add a dropdown element
 data_stat = data_stat[data_stat['Zone'] == selected_zone_stat]
 
-st.write("Distribución de precios por m² ($US), para propiedades en", selected_zone_stat, ".")
+st.write("Distribución de precios para propiedades en", selected_zone_stat, ".")
+
+#Create a radio button to select the type of price to analyze
+hist_var = st.radio("¿Deseas analizar precios totales (precio de lista) o precios por m²?",('Precios Totales', 'Precios por m²'), key='histogram_radio')
+
+if hist_var == 'Precios Totales':
+    hist_x = "Price_USD"
+else:
+    hist_x = "Price_m2_USD"
 
 #Create histogram for price by m2 (filtered by zone)
-fig_hist = px.histogram(data_stat, x="Price_m2_USD", labels=dict(Price_m2_USD="Precio por m² ($US)"))
+fig_hist = px.histogram(data_stat, x=hist_x, labels=dict(Price_USD="Precio en US$", Price_m2_USD="Precio por m² ($US)"))
 fig_hist.layout.yaxis.title.text = 'Número de Propiedades' #Rename y-axis label
 st.plotly_chart(fig_hist, use_container_width=True) #write the figure in the web app and make it responsive
 #Explanation on distinction between mean and median
-st.write("Nótese que el centro de masa no es el precio medio (mediana) de", round(data_stat['Price_m2_USD'].median(),2), "$US, que se reporta en la sección de Análisis de Zona, sino el precio promedio, el cual es de", round(data_stat['Price_m2_USD'].mean(),2), "$US para", selected_zone_stat, ".")
+st.write("Nótese que el centro de masa no es el precio medio (mediana) de", round(data_stat[hist_x].median(),2), "$US, que se reporta en la sección de Análisis de Zona, sino el precio promedio, el cual es de", round(data_stat[hist_x].mean(),2), "$US para", selected_zone_stat, ".")
 
 st.subheader("Relación entre Precio ($US) y Superficie (m²)")
 #Create scatter plot (filtered by zone)
@@ -156,7 +165,7 @@ reg_results = pd.read_html(results_as_html, header=None, index_col=0)[0] #Read a
 r_squared = reg_results.loc['Dep. Variable:'][3] #Extract R-Squared
 st.write("En función del modelo desplegado en el gráfico de dispersión, se puede notar que para la", selected_zone_stat, ", el","{:.0%}".format(r_squared), "de la varianza en el precio puede ser predicha basándose en la cantidad de m² de la propiedad.")
 st.markdown("Cuanto más alto este porcentaje, mayor es la dependencia del precio en función de la superficie. Esto podría indicar que otras variables son menos significativas. Por otra parte, si el porcentaje es bajo, puede ser que otras variables que no están siendo consideradas en este análisis tengan un mayor efecto en el precio, por ejemplo, la plusvalía de la zona, seguridad, proximidad a puntos de interés, etc.")
-st.markdown("""Por último, también se sugiere considerar la cantidad de observaciones que son partes del análisis, ya que el tamaño de la muestra también puede afectar el <a href="https://es.wikipedia.org/wiki/Coeficiente_de_determinaci%C3%B3n" target="_blank"> coeficiente de determinación.</a>""", unsafe_allow_html=True)
+st.markdown("""Por último, también se sugiere considerar la cantidad de observaciones que son parte del análisis, ya que el tamaño de la muestra también puede afectar el <a href="https://es.wikipedia.org/wiki/Coeficiente_de_determinaci%C3%B3n" target="_blank"> coeficiente de determinación.</a>""", unsafe_allow_html=True)
 
 
 st.text("")
@@ -165,18 +174,29 @@ st.subheader("Comparación de distribución de precios entre Zonas")
 selected_zone_stat2 = st.selectbox("Seleccionar una segunda Zona para realizar la comparación.", data_stat2['Zone'].unique(), key='zone_box_2',index=0) #Add a dropdown element
 data_stat2 = data_stat2[data_stat2['Zone'] == selected_zone_stat2]
 
+#Create a radio button to select the type of price to analyze
+comp_hist_var = st.radio("¿Deseas analizar precios totales (precio de lista) o precios por m²?",('Precios Totales', 'Precios por m²'), key='comparison_histogram_radio')
+
+if comp_hist_var == 'Precios Totales':
+    comp_hist_x = "Price_USD"
+    comp_label = "Precio en US$"
+else:
+    comp_hist_x = "Price_m2_USD"
+    comp_label = "Precio por m² ($US)"
+
 # Overlay histogram
 compare_hist_df = pd.DataFrame(dict(
-    Zonas=np.concatenate(([selected_zone_stat]*len(data_stat['Price_m2_USD']), [selected_zone_stat2]*len(data_stat2['Price_m2_USD']))), 
-    data  =np.concatenate((data_stat['Price_m2_USD'],data_stat2['Price_m2_USD']))
+    Zonas=np.concatenate(([selected_zone_stat]*len(data_stat[comp_hist_x]), [selected_zone_stat2]*len(data_stat2[comp_hist_x]))), 
+    data  =np.concatenate((data_stat[comp_hist_x],data_stat2[comp_hist_x]))
 ))
+
 fig_compare_hist = px.histogram(compare_hist_df, x="data", color="Zonas", barmode="overlay",
-                                labels=dict(data="Precio por m² ($US)"))
+                                labels=dict(data=comp_label))
 fig_compare_hist.layout.yaxis.title.text = 'Número de Propiedades'
 st.plotly_chart(fig_compare_hist, use_container_width=True) #write the figure in the web app and make it responsive
 #Summary
-st.write("El precio promedio para", selected_zone_stat, "es de", round(data_stat['Price_m2_USD'].mean(),2), "$US, mientras que el precio promedio para", selected_zone_stat2, "es de", round(data_stat2['Price_m2_USD'].mean(),2), "$US.")
-st.write("Se recomienda también tomar en cuenta el precio medio debido a que es menos sensible a valores atípicos. El precio medio para", selected_zone_stat, "es de", round(data_stat['Price_m2_USD'].median(),2), "$US, y para", selected_zone_stat2, "es de", round(data_stat2['Price_m2_USD'].median(),2), "$US.")
+st.write("El precio promedio para", selected_zone_stat, "es de", round(data_stat[comp_hist_x].mean(),2), "$US, mientras que el precio promedio para", selected_zone_stat2, "es de", round(data_stat2[comp_hist_x].mean(),2), "$US.")
+st.write("Se recomienda también tomar en cuenta el precio medio debido a que es menos sensible a valores atípicos. El precio medio para", selected_zone_stat, "es de", round(data_stat[comp_hist_x].median(),2), "$US, y para", selected_zone_stat2, "es de", round(data_stat2[comp_hist_x].median(),2), "$US.")
 
 
 st.text("")
