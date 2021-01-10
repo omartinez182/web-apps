@@ -37,19 +37,21 @@ st.header("Análisis de Zona")
 #Create a dropdown to select the zone
 selected_zone = st.selectbox("Seleccionar Zona", data['Zone'].unique(), key='zone_box', index=1) #Add a dropdown element
 data = data[data['Zone'] == selected_zone]
-median = round(data['Price_USD'].median())
+tot_median = round(data['Price_USD'].median()) #Calculate total price median
+m2_median = round(data['Price_m2_USD'].median(),2) #Calculate price per sqmt median
 #Print the average price for the selection & the number of observations available
-st.write("El precio medio por m² en", selected_zone, "es de: ", round(data['Price_m2_USD'].median(),2), "US$. Este calculo fue realizado en base a", data.shape[0],"propiedades. El precio medio total es de", "$"+str("{:,}".format(median)+"."))
+st.write("El precio medio por m² en", selected_zone, "es de: ", m2_median, "US$. Este calculo fue realizado en base a", data.shape[0],"propiedades. El precio medio total es de", "$"+str("{:,}".format(tot_median)+"."))
 
 st.text("")
 st.subheader("Filtra Propiedades dependiendo del # de habitaciones")
 #Create a slider to select the number of bedrooms
-how_many_bedrooms = st.slider("Selecciona el # de habitaciones", 0, 10, value=3) #Add a slider element
-#Filter 
+how_many_bedrooms = st.slider("Selecciona el # de habitaciones", min(data['Bedrooms']), max(data['Bedrooms']), value=3) #Add a slider element
+#Filter by the selected number of bedrooms
 data_bedrooms = data[data['Bedrooms'] == how_many_bedrooms]
-median_bdr = round(data_bedrooms['Price_USD'].median())
+tot_median_bdr = round(data_bedrooms['Price_USD'].median()) #Calculate total price median
+m2_median_bdr = round(data_bedrooms['Price_m2_USD'].median(),2) #Calculate price per sqmt median
 #Print the average price for the selection of both zone and # of bedrooms
-st.write("El precio medio por m² para", selected_zone, ", en propiedades con", how_many_bedrooms, "habitaciones, es de: ",round(data_bedrooms['Price_m2_USD'].median(),2), "US$. Este calculo fue realizado en base a", data_bedrooms.shape[0],"propiedades. El precio medio total es de", "$"+str("{:,}".format(median_bdr)+"."))
+st.write("El precio medio por m² para", selected_zone, ", en propiedades con", how_many_bedrooms, "habitaciones, es de: ", m2_median_bdr, "US$. Este calculo fue realizado en base a", data_bedrooms.shape[0],"propiedades. El precio medio total es de", "$"+str("{:,}".format(tot_median_bdr)+"."))
 #Create a map based on a query to the dataframe
 st.map(data.query("Bedrooms == @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
 #Disclaimer
