@@ -42,6 +42,7 @@ m2_median = round(data['Price_m2_USD'].median(),2) #Calculate price per sqmt med
 #Print the average price for the selection & the number of observations available
 st.write("El precio medio por m² en", selected_zone, "es de: ", m2_median, "US$. Este calculo fue realizado en base a", data.shape[0],"propiedades. El precio medio total es de", "$"+str("{:,}".format(tot_median)+"."))
 
+
 st.text("")
 st.subheader("Filtra Propiedades dependiendo del # de habitaciones")
 #Create a slider to select the number of bedrooms
