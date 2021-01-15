@@ -10,14 +10,14 @@ import base64
 st.set_page_config(page_title='Precios de Apartamentos y Casas en la Cuidad Guatemala.', page_icon = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/lg/57/flag-for-guatemala_1f1ec-1f1f9.png")
 
 #Load dataset
-DATA_URL = ("https://raw.githubusercontent.com/omartinez182/web-apps/master/GT/Scrape_Sale_01-01-2021.csv")
+DATA_URL = ("https://raw.githubusercontent.com/omartinez182/web-apps/master/GT/Scrape_Sale_01-07-2021.csv")
 
 #Create initial titles/subtitles
 st.title("Real Estate Analysis Guatemala City")
 st.markdown("Esta aplicación permite analizar la distribución de precios de propiedades en venta en la Área Metropolitana de la Ciudad de Guatemala. 🇬🇹 🏘️")
 st.markdown('De momento, esta es la única base de datos de acceso abierto y motor de análisis de precios de inmuebles en Guatemala. La aplicación tiene como objetivo apoyar a instituciones gubernamentales, "non-profits", y a todos los guatemaltecos a obtener acceso fácil y gratuito a datos relacionados con el mercado de bienes raíces local. Además, provee análisis estadísticos esenciales para apoyar la toma de decisiones, desde la compra de un nuevo hogar, hasta planificaciones urbanas.')
 st.markdown("<small> Built by Omar Eduardo Martinez </small>", unsafe_allow_html=True)
-st.markdown("<small> Data Scraped from the Web </br> **Last Update:** 01/01/2021 </small>", unsafe_allow_html=True)
+st.markdown("<small> Data Scraped from the Web </br> **Last Update:** 01/07/2021 </small>", unsafe_allow_html=True)
 
 
 @st.cache(persist=True) #We use this to cache the info and not load the data every time we scroll up/down
