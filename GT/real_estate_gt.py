@@ -54,13 +54,26 @@ else:
 data_bedrooms = data[data['Bedrooms'] == how_many_bedrooms]
 #Try and except, for the cases in which there aren't any properties with the selected # of bedrooms
 try:
-    tot_median_bdr = round(data_bedrooms['Price_USD'].median(),2) #Calculate total price median
-    m2_median_bdr = round(data_bedrooms['Price_m2_USD'].median(),2) #Calculate price per sqmt median
-    #Print the average price for the selection of both zone and # of bedrooms
-    st.write('<html lang="es"><html translate="no">', "El precio medio por m² para", selected_zone, ", en propiedades con", str("{:,}".format(how_many_bedrooms)), "habitaciones, es de ", "$"+str("{:,}".format(m2_median_bdr)+"."), "Este calculo fue realizado en base a", str("{:,}".format(data_bedrooms.shape[0])),"propiedades. El precio medio total es de", "$"+str("{:,}".format(tot_median_bdr)+"."), unsafe_allow_html=True)
-    #Create a map based on a query to the dataframe
-    st.text("")
-    st.map(data.query("Bedrooms == @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
+    if (data_bedrooms.shape[0] == 0):
+        how_many_bedrooms_2 = 3
+        st.write('<html lang="es"><html translate="no">', "No pudimos encontrar propiedades con",  str("{:,}".format(how_many_bedrooms)), "habitaciones, en", selected_zone, ". Por lo tanto, hemos decidido mostrar los resultados para propiedades de",  str("{:,}".format(how_many_bedrooms_2)), "habitaciones.", unsafe_allow_html=True)
+        st.text("")
+        data_bedrooms = data[data['Bedrooms'] == how_many_bedrooms_2]
+        tot_median_bdr = round(data_bedrooms['Price_USD'].median(),2) #Calculate total price median
+        m2_median_bdr = round(data_bedrooms['Price_m2_USD'].median(),2) #Calculate price per sqmt median
+        #Print the average price for the selection of both zone and # of bedrooms
+        st.write('<html lang="es"><html translate="no">', "El precio medio por m² para", selected_zone, ", en propiedades con", str("{:,}".format(how_many_bedrooms_2)), "habitaciones, es de ", "$"+str("{:,}".format(m2_median_bdr)+"."), "Este calculo fue realizado en base a", str("{:,}".format(data_bedrooms.shape[0])),"propiedades. El precio medio total es de", "$"+str("{:,}".format(tot_median_bdr)+"."), unsafe_allow_html=True)
+        st.text("")
+        #Create a map based on a query to the dataframe
+        st.map(data.query("Bedrooms == @how_many_bedrooms_2")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
+    else:
+        tot_median_bdr = round(data_bedrooms['Price_USD'].median(),2) #Calculate total price median
+        m2_median_bdr = round(data_bedrooms['Price_m2_USD'].median(),2) #Calculate price per sqmt median
+        #Print the average price for the selection of both zone and # of bedrooms
+        st.write('<html lang="es"><html translate="no">', "El precio medio por m² para", selected_zone, ", en propiedades con", str("{:,}".format(how_many_bedrooms)), "habitaciones, es de ", "$"+str("{:,}".format(m2_median_bdr)+"."), "Este calculo fue realizado en base a", str("{:,}".format(data_bedrooms.shape[0])),"propiedades. El precio medio total es de", "$"+str("{:,}".format(tot_median_bdr)+"."), unsafe_allow_html=True)
+        #Create a map based on a query to the dataframe
+        st.text("")
+        st.map(data.query("Bedrooms == @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
 except:
     how_many_bedrooms_2 = 3
     st.write('<html lang="es"><html translate="no">', "No pudimos encontrar propiedades con",  str("{:,}".format(how_many_bedrooms)), "habitaciones, en", selected_zone, ". Por lo tanto, hemos decidido mostrar los resultados para propiedades de",  str("{:,}".format(how_many_bedrooms_2)), "habitaciones.", unsafe_allow_html=True)
