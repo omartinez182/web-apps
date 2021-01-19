@@ -36,8 +36,8 @@ st.header("Análisis de Zona")
 #Create a dropdown to select the zone
 selected_zone = st.selectbox("Seleccionar Zona", data['Zone'].unique(), key='zone_box', index=2) #Add a dropdown element
 data = data[data['Zone'] == selected_zone]
-tot_median = round(data['Price_USD'].median()) #Calculate total price median
-m2_median = round(data['Price_m2_USD'].median()) #Calculate price per sqmt median
+tot_median = round(data['Price_USD'].median(),2) #Calculate total price median
+m2_median = round(data['Price_m2_USD'].median(),2) #Calculate price per sqmt median
 #Print the average price for the selection & the number of observations available
 st.write('<html lang="es"><html translate="no">', 'El precio medio por m² en', selected_zone, 'es de ', "$"+str("{:,}".format(m2_median)+"."), 'Este calculo fue realizado en base a', str("{:,}".format(data.shape[0])), 'propiedades. El precio medio total es de', "$"+str("{:,}".format(tot_median)+"."), unsafe_allow_html=True)
 
@@ -54,8 +54,8 @@ else:
 data_bedrooms = data[data['Bedrooms'] == how_many_bedrooms]
 #Try and except, for the cases in which there aren't any properties with the selected # of bedrooms
 try:
-    tot_median_bdr = round(data_bedrooms['Price_USD'].median()) #Calculate total price median
-    m2_median_bdr = round(data_bedrooms['Price_m2_USD'].median()) #Calculate price per sqmt median
+    tot_median_bdr = round(data_bedrooms['Price_USD'].median(),2) #Calculate total price median
+    m2_median_bdr = round(data_bedrooms['Price_m2_USD'].median(),2) #Calculate price per sqmt median
     #Print the average price for the selection of both zone and # of bedrooms
     st.write('<html lang="es"><html translate="no">', "El precio medio por m² para", selected_zone, ", en propiedades con", str("{:,}".format(how_many_bedrooms)), "habitaciones, es de ", "$"+str("{:,}".format(m2_median_bdr)+"."), "Este calculo fue realizado en base a", str("{:,}".format(data_bedrooms.shape[0])),"propiedades. El precio medio total es de", "$"+str("{:,}".format(tot_median_bdr)+"."), unsafe_allow_html=True)
     #Create a map based on a query to the dataframe
@@ -66,7 +66,7 @@ except:
     st.write('<html lang="es"><html translate="no">', "No pudimos encontrar propiedades con",  str("{:,}".format(how_many_bedrooms)), "habitaciones, en", selected_zone, ". Por lo tanto, hemos decidido mostrar los resultados para propiedades de",  str("{:,}".format(how_many_bedrooms_2)), "habitaciones.", unsafe_allow_html=True)
     st.text("")
     data_bedrooms = data[data['Bedrooms'] == how_many_bedrooms_2]
-    tot_median_bdr = round(data_bedrooms['Price_USD'].median()) #Calculate total price median
+    tot_median_bdr = round(data_bedrooms['Price_USD'].median(),2) #Calculate total price median
     m2_median_bdr = round(data_bedrooms['Price_m2_USD'].median(),2) #Calculate price per sqmt median
     #Print the average price for the selection of both zone and # of bedrooms
     st.write('<html lang="es"><html translate="no">', "El precio medio por m² para", selected_zone, ", en propiedades con", str("{:,}".format(how_many_bedrooms_2)), "habitaciones, es de ", "$"+str("{:,}".format(m2_median_bdr)+"."), "Este calculo fue realizado en base a", str("{:,}".format(data_bedrooms.shape[0])),"propiedades. El precio medio total es de", "$"+str("{:,}".format(tot_median_bdr)+"."), unsafe_allow_html=True)
@@ -175,7 +175,7 @@ fig_hist = px.histogram(data_stat, x=hist_x, labels=dict(Price_USD="Precio en US
 fig_hist.layout.yaxis.title.text = 'Número de Propiedades' #Rename y-axis label
 st.plotly_chart(fig_hist, use_container_width=True) #write the figure in the web app and make it responsive
 #Explanation on distinction between mean and median
-st.write('<html lang="es"><html translate="no">', "Nótese que el centro de masa no es el precio medio (mediana) de", "$"+str("{:,}".format(round(data_stat[hist_x].median()))), "que se reporta en la sección de Análisis de Zona, sino el precio promedio, el cual es de", "$"+str("{:,}".format(round(data_stat[hist_x].mean()))), "para", selected_zone_stat, ".", unsafe_allow_html=True)
+st.write('<html lang="es"><html translate="no">', "Nótese que el centro de masa no es el precio medio (mediana) de", "$"+str("{:,}".format(round(data_stat[hist_x].median(),2))), "que se reporta en la sección de Análisis de Zona, sino el precio promedio, el cual es de", "$"+str("{:,}".format(round(data_stat[hist_x].mean(),2))), "para", selected_zone_stat, ".", unsafe_allow_html=True)
 st.text("")
 
 st.subheader("Relación entre Precio (US$) y Superficie (m²)")
