@@ -18,7 +18,7 @@ st.title("Análisis Inmobiliario Ciudad de Guatemala")
 st.markdown("Esta aplicación permite analizar la distribución de precios de propiedades en venta en la Área Metropolitana de la Ciudad de Guatemala.")
 st.write('<html lang="es"><html translate="no">', 'De momento, esta es la única base de datos de acceso abierto y motor de análisis de precios de inmuebles en Guatemala. La aplicación tiene como objetivo apoyar a instituciones gubernamentales, "non-profits", y todos los guatemaltecos a obtener acceso fácil y gratuito a datos relacionados con el mercado de bienes raíces local. Además, provee análisis estadísticos esenciales para apoyar la toma de decisiones, desde la compra de un nuevo hogar, hasta planificaciones urbanas.', unsafe_allow_html=True)
 st.text("")
-st.markdown("<small> Datos recolectados de la Web </br> **Ultima Actualización:** 01/07/2021 </small>", unsafe_allow_html=True)
+st.markdown("<small> Datos recolectados de la Web </br> **Ultima Actualización:** 01/21/2021 </small>", unsafe_allow_html=True)
 
 @st.cache(persist=True) #We use this to cache the info and not load the data every time we scroll up/down
 def load_data(nrows):
@@ -28,6 +28,15 @@ def load_data(nrows):
 
 #Load 10,000 rows of data
 data = load_data(10000)
+
+#Create a dropdown to select the type of property
+selected_type = st.selectbox("Seleccionar Tipo de Propiedad", ['Casas','Apartamentos'], key='property_type_box', index=0) #Add a dropdown element
+#Filter depending on the selection
+if (selected_type == 'Casas'):
+    data = data[data['Tipo'] == 42021]
+else:
+    data = data[data['Tipo'] == 42020]
+#Create copies for other the diffferent sections
 data_tot = data.copy()
 data_stat = data.copy()
 data_stat2 = data.copy()
