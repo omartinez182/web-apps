@@ -10,6 +10,16 @@ import base64
 st.set_page_config(page_title='Precios de Apartamentos y Casas en la Cuidad Guatemala.', page_icon = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/lg/57/flag-for-guatemala_1f1ec-1f1f9.png")
 st.markdown('<html lang="es"><html translate="no">', unsafe_allow_html=True)
 
+
+#Remove rainbow bar
+hide_decoration_bar_style = '''
+    <style>
+        header {visibility: hidden;}
+    </style>
+'''
+st.markdown(hide_decoration_bar_style, unsafe_allow_html=True)
+
+
 #Load dataset
 DATA_URL = ("https://raw.githubusercontent.com/omartinez182/web-apps/master/GT/Scrape_Sale_01-07-2021.csv")
 
