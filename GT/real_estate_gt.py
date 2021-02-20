@@ -5,10 +5,28 @@ import pydeck as pdk
 import pandas as pd
 import numpy as np
 import base64
+import os
+import re
 
 #Set title and favicon
 st.set_page_config(page_title='Precios de Apartamentos y Casas en la Cuidad Guatemala.', page_icon = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/lg/57/flag-for-guatemala_1f1ec-1f1f9.png")
 st.markdown('<html lang="es"><html translate="no">', unsafe_allow_html=True)
+
+code = """<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NLR68SM');</script>
+<!-- End Google Tag Manager -->"""
+
+a=os.path.dirname(st.__file__)+'/static/index.html'
+with open(a, 'r') as f:
+    data=f.read()
+    if len(re.findall('GTM-', data))==0:
+        with open(a, 'w') as ff:
+            newdata=re.sub('<head>','<head>'+code,data)
+            ff.write(newdata)
 
 #Load dataset
 DATA_URL = ("https://raw.githubusercontent.com/omartinez182/web-apps/master/GT/Scrape_Sale_01-07-2021.csv")
@@ -29,7 +47,6 @@ def load_data(nrows):
 
 #Load 10,000 rows of data
 data = load_data(10000)
-
 #Create a dropdown to select the type of property
 selected_type = st.selectbox("Seleccionar Tipo de Propiedad", ['Casas','Apartamentos'], key='property_type_box', index=0) #Add a dropdown element
 #Filter depending on the selection
@@ -41,6 +58,7 @@ else:
 data_tot = data.copy()
 data_stat = data.copy()
 data_stat2 = data.copy()
+
 
 st.header("Análisis de Zona")
 #Create a dropdown to select the zone
@@ -63,15 +81,7 @@ else:
 #Filter by the selected number of bedrooms
 data_bedrooms = data[data['Bedrooms'] == how_many_bedrooms]
 #Try and except, for the cases in which there aren't any properties with the selected # of bedrooms
-try:
-    tot_median_bdr = round(data_bedrooms['Price_USD'].median(),2) #Calculate total price median
-    m2_median_bdr = round(data_bedrooms['Price_m2_USD'].median(),2) #Calculate price per sqmt median
-    #Print the average price for the selection of both zone and # of bedrooms
-    st.write('<html lang="es"><html translate="no">', "El precio medio por m² para", selected_zone, ", en propiedades con", str("{:,}".format(how_many_bedrooms)), "habitaciones, es de ", "$"+str("{:,}".format(m2_median_bdr)+"."), "Este calculo fue realizado en base a", str("{:,}".format(data_bedrooms.shape[0])),"propiedades. El precio medio total es de", "$"+str("{:,}".format(tot_median_bdr)+"."), unsafe_allow_html=True)
-    #Create a map based on a query to the dataframe
-    st.text("")
-    st.map(data.query("Bedrooms == @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
-except:
+if (data_bedrooms.shape[0] == 0):
     how_many_bedrooms_2 = 3
     st.write('<html lang="es"><html translate="no">', "No pudimos encontrar propiedades con",  str("{:,}".format(how_many_bedrooms)), "habitaciones, en", selected_zone, ". Por lo tanto, hemos decidido mostrar los resultados para propiedades de",  str("{:,}".format(how_many_bedrooms_2)), "habitaciones.", unsafe_allow_html=True)
     st.text("")
@@ -83,6 +93,14 @@ except:
     st.text("")
     #Create a map based on a query to the dataframe
     st.map(data.query("Bedrooms == @how_many_bedrooms_2")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
+else:
+    tot_median_bdr = round(data_bedrooms['Price_USD'].median(),2) #Calculate total price median
+    m2_median_bdr = round(data_bedrooms['Price_m2_USD'].median(),2) #Calculate price per sqmt median
+    #Print the average price for the selection of both zone and # of bedrooms
+    st.write('<html lang="es"><html translate="no">', "El precio medio por m² para", selected_zone, ", en propiedades con", str("{:,}".format(how_many_bedrooms)), "habitaciones, es de ", "$"+str("{:,}".format(m2_median_bdr)+"."), "Este calculo fue realizado en base a", str("{:,}".format(data_bedrooms.shape[0])),"propiedades. El precio medio total es de", "$"+str("{:,}".format(tot_median_bdr)+"."), unsafe_allow_html=True)
+    #Create a map based on a query to the dataframe
+    st.text("")
+    st.map(data.query("Bedrooms == @how_many_bedrooms")[['latitude', 'longitude']].dropna(how = 'any')) #We use the @ to query the variable created for the slider
 
 #Disclaimer
 st.markdown(
