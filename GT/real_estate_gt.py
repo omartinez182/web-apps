@@ -12,12 +12,14 @@ import re
 st.set_page_config(page_title='Precios de Apartamentos y Casas en la Cuidad Guatemala.', page_icon = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/lg/57/flag-for-guatemala_1f1ec-1f1f9.png")
 st.markdown('<html lang="es"><html translate="no">', unsafe_allow_html=True)
 
+
+#Code to automatically include GTM Container
 code = """<!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-NLR68SM');</script>
+})(window,document,'script','dataLayer','GTM-XXXXXX');</script>
 <!-- End Google Tag Manager -->"""
 
 a=os.path.dirname(st.__file__)+'/static/index.html'
@@ -27,6 +29,7 @@ with open(a, 'r') as f:
         with open(a, 'w') as ff:
             newdata=re.sub('<head>','<head>'+code,data)
             ff.write(newdata)
+
 
 #Load dataset
 DATA_URL = ("https://raw.githubusercontent.com/omartinez182/web-apps/master/GT/Scrape_Sale_01-07-2021.csv")
