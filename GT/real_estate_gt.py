@@ -19,7 +19,7 @@ code = """<!-- Google Tag Manager -->
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-XXXXXX');</script>
+})(window,document,'script','dataLayer','GTM-NLR68SM');</script>
 <!-- End Google Tag Manager -->"""
 
 a=os.path.dirname(st.__file__)+'/static/index.html'
@@ -161,18 +161,29 @@ selected_city = st.multiselect("Seleccionar Ciudad", list(data_tot['City'].uniqu
 mask_city = data_tot['City'].isin(selected_city) # Mask to filter dataframe
 data_tot = data_tot[mask_city]
 
+#Create a radio button to select the type of price to analyze
+bar_var = st.radio("¿Deseas analizar precios totales (precio de lista) o precios por m²?",('Precios Totales', 'Precios por m²'), key='bar_plot_radio')
+
+if bar_var == 'Precios Totales':
+    bar_x = "Price_USD"
+else:
+    bar_x = "Price_m2_USD"
+
+
 #Average prices by zone
 df_mean = data_tot.groupby('Zone').mean() #Group by zone and calculate averages
 df_mean = df_mean[['Bedrooms','Bathrooms','Surface','Price_USD','Price_m2_USD']]
+df_mean['Count'] = data_tot.groupby('Zone').count()['Price_USD']
 df_mean = df_mean.round()
-df_mean = df_mean.sort_values(by='Price_m2_USD')
+df_mean = df_mean.sort_values(by=bar_x)
 
 #Create bar plot for averages by zone
 fig_bar = px.bar(df_mean,                   
              x = df_mean.index,                          
-             y = 'Price_m2_USD',                         
-             color = 'Price_USD',                  
-             labels=dict(x="Zona", Price_USD="Precio (Avg.) US$", Price_m2_USD="Promedio de Precio por m² (US$)")
+             y = bar_x,                         
+             color = 'Count',                  
+             labels=dict(x="Zona", Price_USD="Precio (Avg.) US$", Price_m2_USD="Promedio de Precio por m² (US$)", Count='# de Propiedades en la muestra'),
+             color_continuous_scale=px.colors.sequential.RdBu
              )
 fig_bar.update_xaxes(title='')
 #fig_bar.layout.yaxis.title.text = 'Número de Propiedades' #Rename y-axis label
