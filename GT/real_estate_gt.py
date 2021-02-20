@@ -46,6 +46,7 @@ st.markdown("<small> Datos recolectados de la Web </br> **Ultima Actualización:
 def load_data(nrows):
     data = pd.read_csv(DATA_URL, nrows=nrows) #Function to perform some transformation in the dataframe
     data.dropna(subset=['latitude', 'longitude'], inplace=True)
+    data = data.drop(['Unnamed: 0'], axis=1)
     return data
 
 #Load 10,000 rows of data
@@ -151,9 +152,9 @@ st.write('<html lang="es"><html translate="no">', "<small> *Debido a la forma en
 
 st.text("")
 st.text("")
-st.header("Promedios por Zona")
+st.header("Precios Medios por Zona")
 #Explanation
-st.write('<html lang="es"><html translate="no">', "El gráfico de barras se encuentra ordenado según el precio promedio por m² de cada zona. El color de cada barra representa el precio promedio total para cada zona, es decir, el promedio de los precios de lista de cada propiedad.", unsafe_allow_html=True)
+st.write('<html lang="es"><html translate="no">', "El gráfico de barras se encuentra ordenado por el precio medio (mediana). El color de cada barra representa la cantidad de propiedades utilizadas para calcular el precio medio. Por lo general, se puede confiar más en el precio medio muestral cuanto más grande es la cantidad de observaciones utilizadas para su calculo.", unsafe_allow_html=True)
 st.text("")
 
 #Create a multi-select to select the zone
@@ -171,15 +172,15 @@ else:
 
 
 #Average prices by zone
-df_mean = data_tot.groupby('Zone').mean() #Group by zone and calculate averages
-df_mean = df_mean[['Bedrooms','Bathrooms','Surface','Price_USD','Price_m2_USD']]
-df_mean['Count'] = data_tot.groupby('Zone').count()['Price_USD']
-df_mean = df_mean.round()
-df_mean = df_mean.sort_values(by=bar_x)
+df_median = data_tot.groupby('Zone').median() #Group by zone and calculate averages
+df_median = df_median[['Bedrooms','Bathrooms','Surface','Price_USD','Price_m2_USD']]
+df_median['Count'] = data_tot.groupby('Zone').count()['Price_USD']
+df_median = df_median.round()
+df_median = df_median.sort_values(by=bar_x)
 
 #Create bar plot for averages by zone
-fig_bar = px.bar(df_mean,                   
-             x = df_mean.index,                          
+fig_bar = px.bar(df_median,                   
+             x = df_median.index,                          
              y = bar_x,                         
              color = 'Count',                  
              labels=dict(x="Zona", Price_USD="Precio (Avg.) US$", Price_m2_USD="Promedio de Precio por m² (US$)", Count='# de Propiedades en la muestra'),
