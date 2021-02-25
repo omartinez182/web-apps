@@ -183,7 +183,7 @@ fig_bar = px.bar(df_median,
              x = df_median.index,                          
              y = bar_x,                         
              color = 'Count',                  
-             labels=dict(x="Zona", Price_USD="Precio (Avg.) US$", Price_m2_USD="Promedio de Precio por m² (US$)", Count='# de Propiedades en la muestra'),
+             labels=dict(x="Zona", Price_USD="Precio Medio (US$)", Price_m2_USD="Precio Medio por m² (US$)", Count='# de Propiedades en la muestra'),
              color_continuous_scale=px.colors.sequential.RdBu
              )
 fig_bar.update_xaxes(title='')
